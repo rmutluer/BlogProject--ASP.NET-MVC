@@ -1,0 +1,108 @@
+﻿@model ENTITIES.Entities.Article
+
+@{
+    ViewData["Title"] = "Makale Detayı";
+    Layout = "_AuthorLayout";
+}
+
+<div class="d-flex flex-wrap col-12 justify-content-center">
+    <div class="card col-lg-10 col-md-10 col-sm-10 justify-content-center">
+        <div class="card-body">
+            <dl class="row">
+                <dd class="col-sm-12 ">
+                    @if (string.IsNullOrEmpty(Model.PhotoPath))
+                    {
+                        <div>
+
+                            <div class="profile-photo-container">
+                                <img src="~/img/makale.jpg" alt="Alternate Text" style="width:300px; height:300px; background-position:center; background-size:cover; border-radius:100%;" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="profile-photo-update-container">
+
+                            <div class="profile-photo-container">
+                                <div id="photoUploadTarget" class="profile-photo" style="background-image: url(@Model.PhotoPath);"></div>
+                            </div>
+                        </div>
+                    }
+                </dd>
+                <dt class="col-sm-4 mt-5">
+                    @Html.DisplayNameFor(model => model.Title)
+                </dt>
+                <dd class="col-sm-8 mt-5">
+                    <b>@Html.DisplayFor(model => model.Title)</b>
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Content)
+                </dt>
+                
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Content)
+                </dd>
+                <dt class="col-sm-4 mt-2">
+                    @Html.DisplayNameFor(model => model.Category)
+                </dt>
+                <dd class="col-sm-8 mt-2">
+                    @Html.DisplayFor(model => model.Category)
+                </dd>
+                <dt class="col-sm-4 mt-2">
+                    @Html.DisplayNameFor(model => model.DateOfReply)
+                </dt>
+                <dd class="col-sm-8 mt-2">
+                    @Html.DisplayFor(model => model.DateOfReply)
+                </dd>
+                <dt class="col-sm-4 mt-2">
+                    @Html.DisplayNameFor(model => model.CreateDate)
+                </dt>
+                <dd class="col-sm-8 mt-2">
+                    @Html.DisplayFor(model => model.CreateDate)
+                </dd>
+
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.ConfirmationStatus)
+                </dt>
+                <dd class="col-sm-8">
+                    @if (Convert.ToInt32(Model.ConfirmationStatus) == 1)
+                    {
+                        <i class="mdi mdi-circle status-active"></i>
+                    }
+                    else if (Convert.ToInt32(Model.ConfirmationStatus) == 2)
+                    {
+                        <i class="mdi mdi-circle status-passive"></i>
+                    }
+                    else
+                    {
+                        <i class="mdi mdi-circle status-pending"></i>
+                    }
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dd class="col-sm-8">
+                    @if (Convert.ToInt32(Model.Status) == 1)
+                    {
+                        <i class="mdi mdi-circle status-active"></i>
+                    }
+                    else if (Convert.ToInt32(Model.Status) == 0)
+                    {
+                        <i class="mdi mdi-circle status-passive"></i>
+                    }
+                    else
+                    {
+                        <i class="mdi mdi-circle status-pending"></i>
+                    }
+                </dd>
+
+            </dl>
+        </div>
+        <div class="d-flex ">
+            <a class="btn btn-outline-info mb-3" data-toggle="tooltip" data-placement="bottom" title="Düzenle" asp-controller="Author" asp-action="ArticleUpdate" asp-route-id="@Model.ArticleID">
+                <i class="mdi mdi-account-edit-outline"></i>
+            </a>
+            <a class="btn btn-outline-dark ml-auto align-self-center mb-3" asp-action="MyArticleListForEdit">Listeye Dön</a>
+        </div>
+    </div>
+</div>

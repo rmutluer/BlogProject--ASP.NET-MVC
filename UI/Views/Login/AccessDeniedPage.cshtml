@@ -1,0 +1,53 @@
+﻿@inject UserManager<AppUser> UserManager
+@{
+    Layout = null;
+    AppUser user = await UserManager.GetUserAsync(User);
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Erişim Engellendi!</title>
+    <link href="~/css/AccessDenied.css" rel="stylesheet" />
+    <link href="~/mainBlog/img/icons8-falcon-50.png"  rel="icon"/>
+</head>
+
+<body>
+    <h1>403</h1>
+    <div>
+        <p>> <span>HATA KODU</span>: "<i>HTTP 403 Yasaklı</i>"</p>
+        <p>> <span>HATA AÇIKLAMASI</span>: "<i>Erişim engellendi. Bu Sunucu da Bu Sayfaya Erişim İzniniz Yok!</i>"</p>
+        <p>> <span>OLASI HATA NEDENİ</span>: [<b>yürütme erişimi yasak, okuma erişimi yasak, yazma erişimi yasak, ssl gerekli, ssl 128 gerekli, ip adresi reddedildi, istemci sertifikası gerekli, site erişimi reddedildi, çok fazla kullanıcı, geçersiz yapılandırma, parola değişikliği, eşleyici erişimi reddedildi, istemci sertifikası iptal edildi, dizin listeleme reddedildi, istemci erişim lisansları aşıldı, istemci sertifikası güvenilmez veya geçersiz, istemci sertifikasının süresi doldu veya henüz geçerli değil, pasaport oturumu açılamadı, kaynak erişimi reddedildi, sonsuz derinlik reddedildi, aynı istemci ipinden çok fazla istek geldi</b>...]</p>
+        @if (user.Email == "admin.admin@gmail.com")
+        {
+            <p>> <span>BU SUNUCUDAKİ ERİŞİM İZNİNE SAHİP OLDUĞUNUZ BAZI SAYFALAR</span>: [<a asp-controller="Admin" asp-action="HomePage">Anasayfa</a>, <a asp-controller="Guest" asp-action="DevhellAbout">Hakkımızda</a>, <a asp-controller="Guest" asp-action="DevhellTeam">Ekibimiz</a>...]</p><p>> <span>İYİ GÜNLER DİLERİZ  :-)</span></p>
+        }
+        else
+        {
+
+            <p>> <span>BU SUNUCUDAKİ ERİŞİM İZNİNE SAHİP OLDUĞUNUZ BAZI SAYFALAR</span>: [<a asp-controller="Guest" asp-action="HomePage">Anasayfa</a>, <a asp-controller="Guest" asp-action="DevhellAbout">Hakkımızda</a>, <a asp-controller="Guest" asp-action="DevhellTeam">Ekibimiz</a>...]</p><p>> <span>İYİ GÜNLER DİLERİZ :-)</span></p>
+        }
+    </div>
+
+
+    <script>
+        var str = document.getElementsByTagName('div')[0].innerHTML.toString();
+        var i = 0;
+        document.getElementsByTagName('div')[0].innerHTML = "";
+
+        setTimeout(function () {
+            var se = setInterval(function () {
+                i++;
+                document.getElementsByTagName('div')[0].innerHTML = str.slice(0, i) + "|";
+                if (i == str.length) {
+                    clearInterval(se);
+                    document.getElementsByTagName('div')[0].innerHTML = str;
+                }
+            }, 10);
+        }, 0);
+    </script>
+</body>
+
+
+
+</html>

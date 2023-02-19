@@ -1,0 +1,116 @@
+﻿@model IEnumerable<ENTITIES.Entities.Article>
+
+@{
+    ViewData["Title"] = "Makalelerim";
+    Layout = "_AuthorLayout";
+}
+
+<div class="d-flex header-sticky" style="width:67%">
+    <h1> Makalelerim</h1>
+</div>
+
+
+<div class="d-flex flex-wrap col-12 justify-content-center" style="margin-bottom:170px;">
+    @foreach (var item in Model)
+    {
+        <div class="card col-lg-10 col-md-10 col-sm-10 justify-content-center mt-3">
+
+            <div class="card-body">
+                <dl class="row">
+                   
+                    <dd class="col-sm-12 ">
+                        @if (string.IsNullOrEmpty(item.PhotoPath))
+                        {
+                            <div >
+                               
+                                <div class="profile-photo-container">
+                                    <img src="~/img/makale.jpg" alt="Alternate Text"  style="width:300px; height:300px; background-position:center; background-size:cover; border-radius:100%;"/>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="profile-photo-update-container">
+                              
+                                <div class="profile-photo-container">
+                                    <div id="photoUploadTarget" class="profile-photo" style="background-image: url(@item.PhotoPath); "></div>
+                                </div>
+                            </div>
+                        }
+                    </dd>
+                    <dt class="col-sm-4 mt-5">
+                        @Html.DisplayNameFor(model => model.Title)
+                    </dt>
+                    <dd class="col-sm-8 mt-5">
+                        <b>@Html.DisplayFor(modelItem => item.Title)</b>
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Content)
+                    </dt>
+                    <dd class="col-sm-8">
+                        <p class="description2" data-toggle="tooltip" data-placement="bottom" title="@item.Content">
+                            @Html.DisplayFor(modelItem => item.Content)
+                        </p>
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.DateOfReply)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(modelItem => item.DateOfReply)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.CreateDate)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(modelItem => item.CreateDate)
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.ConfirmationStatus)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (Convert.ToInt32(item.ConfirmationStatus) == 1)
+                        {
+                            <i class="mdi mdi-circle status-active"></i>
+                        }
+                        else if (Convert.ToInt32(item.ConfirmationStatus) == 2)
+                        {
+                            <i class="mdi mdi-circle status-passive"></i>
+                        }
+                        else
+                        {
+                            <i class="mdi mdi-circle status-pending"></i>
+                        }
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (Convert.ToInt32(item.Status) == 1)
+                        {
+                            <i class="mdi mdi-circle status-active"></i>
+                        }
+                        else if (Convert.ToInt32(item.Status) == 0)
+                        {
+                            <i class="mdi mdi-circle status-passive"></i>
+                        }
+                        else
+                        {
+                            <i class="mdi mdi-circle status-pending"></i>
+                        }
+                    </dd>
+
+                </dl>
+            </div>
+
+
+            <div class="d-flex " style="padding-left:95%;">
+                <a class="btn btn-outline-info mb-3 mr-0"  data-toggle="tooltip" data-placement="bottom" title="Detay" asp-controller="Author" asp-action="ArticleDetails" asp-route-id="@item.ArticleID">
+                        <i class="fas fa-arrow-circle-right"></i>
+                </a>
+               
+            </div>
+
+        </div>
+    }
+</div>

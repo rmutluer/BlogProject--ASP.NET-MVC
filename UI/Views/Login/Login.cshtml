@@ -1,0 +1,117 @@
+﻿@model LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Giriş";
+    string passwordConstraints = "Parolanız: 8 - 15 karakter uzunluğunda olmalı.En az 1 büyük harf, 1 küçük harf, 1 rakam ve 1 özel karakter içermeli.";
+
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Giriş Yap-Kayıt Ol</title>
+    <link href="~/mainBlog/img/icons8-falcon-50.png" rel="icon" />
+    <link href="~/css/Login.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+    <link href="~/lib/toastr.js/toastr.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    @* eklediklerimiz *@
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/css/mdi/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="~/mainBlog/vendor/flag-icon-css/css/flag-icon.min.css" rel="stylesheet" />
+    <link href="~/css/popContent.css" rel="stylesheet" />
+    <link href="~/mainBlog/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+</head>
+<body>
+           
+    <div class="main">
+        <input type="checkbox" id="chk" aria-hidden="true">
+        <div class="signup">
+            <form asp-action="Login" method="post">
+                @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+                @if (TempData["Hata"] != null)
+                {
+                    <div>
+                        <span style="color:white; text-align:center; margin:120px;">@TempData["Hata"]</span>
+                    </div>
+
+                }
+                <label for="chk" aria-hidden="true">GİRİŞ</label>
+                <input type="text" asp-for="Email" placeholder="Email">
+                <div style="display:flex;flex-direction: row;flex-wrap: wrap;justify-content:right;align-items: flex-end;">
+                    <input type="password" asp-for="@Model.Password" id="password" placeholder="Şifre" style="margin-left:2%" />
+                    <i class="eye fa-solid fa-eye-slash d-flex justify-content-end" id="passkey" onclick="pass()" style="margin-bottom:37px; margin-right:20px;; margin-left: 20px;"></i>
+                </div>
+                <button>GİRİŞ YAP</button>
+            </form>
+            <form asp-action="ForgotPassword" method="get">
+                <button>ŞİFREMI UNUTTUM</button>
+            </form>
+
+        </div>
+        <div class="login">
+            <form asp-action="SignUp" method="post">
+                @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+                <label for="chk" aria-hidden="true">ÜYE OL</label>
+                <input type="email" name="Email" placeholder="Email" required="">
+                <div style="display:flex;flex-direction: row;flex-wrap: wrap;justify-content: space-between;align-items: flex-end;">
+
+                    <i class="login__icon fas fa-lock" data-toggle="tooltip" data-placement="top" title="@passwordConstraints" style="margin-bottom: 40px;margin-left: 5%;"></i>
+                    <input type="password" asp-for="@Model.Password" id="password2" placeholder="Şifre" style="margin-left:2%" />
+                    <i class="eye fa-solid fa-eye-slash d-flex justify-content-end" id="passkey2" onclick="pass2()" style="margin-bottom:34px;margin-right: 20px;"></i>
+
+                </div>
+                <div style="display: flex;flex-direction: row;flex-wrap: wrap;justify-content: space-between;align-items: flex-end;">
+                    <i class="login__icon fas fa-lock" style="margin-bottom: 40px;margin-left: 5%;"></i>
+                    <input type="password" name="SecondPassword" id="password3" placeholder="Şifre (Tekrar)" style="margin-left:2%" />
+                    <i class="eye fa-solid fa-eye-slash" id="passkey3" onclick="pass3()" style="margin-bottom:37px;margin-right:20px;"></i>
+                </div>
+                <button>ONAYLA</button>
+            </form>
+        </div>
+
+    </div>
+    <script src="~/js/PasswordEye.js"></script>
+    <script src="~/lib/toastr.js/toastr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip({
+                html: true,
+                placement: "bottom"
+            });
+        });
+    </script>
+    @{
+        var message = TempData["Message"];
+        if (message != null)
+        {
+            <script>
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.success("@message")
+            </script>
+        }
+    }
+    @{
+        var message2 = TempData["Message2"];
+        if (message2 != null)
+        {
+            <script>
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.error("@message2")
+            </script>
+        }
+    }
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

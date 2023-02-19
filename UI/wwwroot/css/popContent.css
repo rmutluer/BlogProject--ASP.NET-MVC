@@ -1,0 +1,11 @@
+﻿body {
+
+}
+.description {
+    width: 8vw;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: 0.875rem;
+}

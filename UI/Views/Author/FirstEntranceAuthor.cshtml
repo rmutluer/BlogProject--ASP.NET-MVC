@@ -1,0 +1,124 @@
+﻿@model UI.Models.FirstEntranceAuthorViewModel
+@inject UserManager<AppUser> userManager
+@{
+    ViewData["Title"] = "Yazar Bilgileri";
+    AppUser user = await userManager.GetUserAsync(User);
+    Layout = "_AuthorLayout";
+}
+
+
+
+<div class="d-flex justify-content-center">
+    <div class="col col-lg-12 col-md-12 col-sm-12">
+        <div class="row m-auto">
+            <div class="col-md-12 text-center">
+                <form asp-controller="Author" asp-action="FirstEntranceAuthor" asp-route-id="@user.Id" id="form" enctype="multipart/form-data" method="post">
+                    <input type="hidden" asp-for="@user.Id" />
+                    <input type="hidden" asp-for="ProfilePhotoPath" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    @if (Model.ProfilePhotoPath == null)
+                    {
+                        <div class="profile-photo-update-container">
+                            <div class="hover-item">
+                                <label asp-for="PhotoFile" class="control-label"><span><i class="mdi mdi-camera"></i> Yükle</span></label>
+                                <input asp-for="PhotoFile" class="form-control profile-photo-input" accept=".jpg, .jpeg, .png" />
+                                <span asp-validation-for="PhotoFile" class="text-danger"></span>
+                            </div>
+                            <div class="profile-photo-container">
+                                <img src="~/img/default-profile-photo.jpg" alt="Alternate Text" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="profile-photo-update-container">
+                            <div class="hover-item">
+                                <label asp-for="PhotoFile" class="control-label"><span><i class="mdi mdi-camera"></i> Yükle</span></label>
+                                <input asp-for="PhotoFile" class="form-control profile-photo-input" accept=".jpg, .jpeg, .png" />
+                                <span asp-validation-for="PhotoFile" class="text-danger"></span>
+                            </div>
+                            <div class="profile-photo-container">
+                                <div id="photoUploadTarget" class="profile-photo" style="background-image: url(@Model.ProfilePhotoPath); "></div>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="control-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SecondName" class="control-label"></label>
+                        <input asp-for="SecondName" class="form-control" />
+                        <span asp-validation-for="SecondName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName" class="control-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SecondLastName" class="control-label"></label>
+                        <input asp-for="SecondLastName" class="form-control" />
+                        <span asp-validation-for="SecondLastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Gender" class="control-label"></label>
+                        @*<input asp-for="Gender" class="form-control" />*@
+                        <select asp-for="Gender" asp-items="@Html.GetEnumSelectList<Gender>()" class="form-control"> </select>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="BirthDate" class="control-label"></label>
+                        <input asp-for="BirthDate" class="form-control" />
+                        <span asp-validation-for="BirthDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="control-label"></label>
+                        <input id="phoneNum1" asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CitizenId" class="control-label"></label>
+                        <input asp-for="CitizenId" class="form-control" />
+                        <span asp-validation-for="CitizenId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Country" class="control-label"></label>
+                        <input asp-for="Country" class="form-control" />
+                        <span asp-validation-for="Country" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Job" class="control-label"></label>
+                        <input asp-for="Job" class="form-control" />
+                        <span asp-validation-for="Job" class="text-danger"></span>
+                    </div>
+                    @*<div class="form-group">
+                        <input type="submit" value="Kaydet" class="btn btn-primary" />
+                    </div>*@
+                </form>
+                <div class="text-center">
+                    <input type="submit" form="form" value="Kaydet" class="btn btn-primary" style="margin-bottom:200px;"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        @section Scripts {
+            @{
+                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            }
+            <script type="text/javascript" src="~/lib/jquery.mask.js"></script>
+            <script>
+                $(function () {
+                    $("#phoneNum1").mask("(000)-000-0000")
+                })
+            </script>
+
+        }

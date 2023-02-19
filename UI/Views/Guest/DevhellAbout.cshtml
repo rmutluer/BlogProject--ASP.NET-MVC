@@ -1,0 +1,375 @@
+﻿@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> _userManager
+@inject IGenericService<Article> _articleService
+@{
+    AppUser user = await _userManager.GetUserAsync(User);
+    var roles = await _userManager.GetUsersInRoleAsync("author");
+    AppUser admin = (AppUser)await _userManager.FindByEmailAsync("admin.admin@gmail.com");
+    var articles = _articleService.GetDefault(x=>x.Status==Status.Active&& x.ConfirmationStatus==ConfirmationStatus.Yes);
+    DateTime dayCreate = new DateTime(2022, 12, 19);
+    DateTime dayNow = DateTime.Now;
+    TimeSpan totalDay = (dayNow - dayCreate);
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Hakkımızda - DEVHELL</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/mainBlog/img/icons8-falcon-50.png" rel="icon" />
+    <link href="~/mainBlog/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/mainBlog/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/mainBlog/css/style.css" rel="stylesheet">
+
+    <!-- =======================================================
+    * Template Name: Moderna - v4.11.0
+    * Template URL: https://bootstrapmade.com/free-bootstrap-template-corporate-moderna/
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+</head>
+
+<body>
+
+
+    <header id="header" class="fixed-top d-flex align-items-center ">
+        <div class="container d-flex justify-content-between align-items-center">
+            @if (admin.Email == "admin.admin@gmail.com")
+            {
+                <div class="logo">
+                    <h1 class="text-light"><a asp-controller="Admin" asp-action="HomePage"><span>DEVHELL</span></a></h1>
+                    <!-- Uncomment below if you prefer to use an image logo -->
+                    <!-- <a href="index.html"><img src="~/mainBlog/img/logo.png" alt="" class="img-fluid"></a>-->
+                </div>
+            }
+            else
+            {
+
+                <div class="logo">
+                    <h1 class="text-light"><a asp-controller="Guest" asp-action="HomePage"><span>DEVHELL</span></a></h1>
+                    <!-- Uncomment below if you prefer to use an image logo -->
+                    <!-- <a href="index.html"><img src="~/mainBlog/img/logo.png" alt="" class="img-fluid"></a>-->
+                </div>
+            }
+            @if (SignInManager.IsSignedIn(User) && admin.Email == "admin.admin@gmail.com")
+            {
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        @* anasayfa *@
+                        <li><a asp-controller="Admin" asp-action="HomePage">Anasayfa</a></li>
+                        @* makaleler *@
+                        <li><a asp-controller="Admin" asp-action="ArticleList">Makaleler</a></li>
+                        <li><a asp-controller="Guest" asp-action="DevhellAbout">Ekibimiz</a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>@user.GetFullName().ToUpper()</span> <i class="bi bi-chevron-down"></i></a>
+                            <ul>
+                                <li><a asp-controller="Admin" asp-action="AdminProfile"><i class="fas fa-user-edit"></i>Profil</a></li>
+                                <li><a asp-controller="Login" asp-action="Logout">Çıkış Yap<i class="fas fa-sign-out-alt"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            }
+            @if (SignInManager.IsSignedIn(User) && admin.Email != "admin.admin@gmail.com")
+            {
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        @* anasayfa *@
+                        <li><a asp-controller="Guest" asp-action="HomePage">Anasayfa</a></li>
+                        @* tüm makaleler *@
+                        <li><a asp-controller="Author" asp-action="MyArticleListForEdit">Makalelerim</a></li>
+                        @* makaleler *@
+                        <li><a asp-controller="Author" asp-action="CreateArticle">Makale Yaz <i style="font-size:18px;" class="fa fa-pencil-square-o"></i></a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>@user.GetFullName().ToUpper()</span> <i class="bi bi-chevron-down"></i></a>
+                            <ul>
+                                <li><a asp-controller="Author" asp-action="AuthorProfile"><i class="fas fa-user-edit"></i>Profil</a></li>
+
+                                <li><a asp-controller="Login" asp-action="Logout">Çıkış Yap<i class="fas fa-sign-out-alt"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            }
+            @if (!SignInManager.IsSignedIn(User))
+            {
+
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        <li><a asp-controller="Guest" asp-action="HomePage">Anasayfa</a></li>
+                        <li><a asp-controller="Guest" asp-action="DevhellAbout">Hakkımızda</a></li>
+                        <li><a asp-controller="Guest" asp-action="DevhellTeam">Ekibimiz</a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>Misafir</span> <i class="bi bi-chevron-down"></i></a>
+                            <ul>
+                                <li><a asp-controller="HomePage" asp-action="Index">Giriş Ekranına Dön</a></li>
+                                <li><a asp-controller="Login" asp-action="Login">Üye Ol</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#footer">İletişim</a></li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            }
+
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+
+
+        <!-- ======= About Section ======= -->
+        <section class="about" data-aos="fade-up">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-6">
+
+                        <img src="~/mainBlog/img/team/WhatsApp Image 2023-02-15 at 17.38.39.jpeg" class="img-fluid" alt="" />
+                    </div>
+                    <div class="col-lg-6 pt-4 pt-lg-0">
+                        <h3>Hedeflerimiz</h3>
+                        <p class="fst-italic">
+                            Ekip olarak halihazır da insanların makale yazarak duygu düşünce birikimlerini göz önüne sermek ve belki de ihtiyaç sahiplerine yazdıkları makaleler üzerinden ulaşıp destek olmayı, bilgi birikimlerini paylaşıp insanları belli konularda bilgilendirmek ya da Afet durumlarında ivedilikle ufak düzenlemelerle depremzedelerin konumlarını bildirebileceği bir platform olabilmek hedeflerimizin  ve gayelerimizin başında gelmektedir...
+                        </p>
+                        <ul>
+                            <li><i class="bi bi-check2-circle"></i>İnsanların her konu da fikir, düşünce ve bilgi birikimlerini bu platform aracılığı ile paylaşmaları.</li>
+                            <li><i class="bi bi-check2-circle"></i>Deprem gibi doğal afetlerde depremzede veya yakınlarının buradan adres bilgilerini paylaşarak arama kurtarma çalışmalarını hızlandırmak.</li>
+                            <li><i class="bi bi-check2-circle"></i>Farklı kullanım amaçlarından doğan ihtiyaçlara göre daha kullanışlı ve çok yönlü bir web projesi ortaya koymak en büyük gayelerimiz arasında.</li>
+                        </ul>
+                        <p>
+                            Dünyanın her noktasındaki hayatlara ufakta olsa dokunabilmeyi amaçlamış ve bu sorumluluk bilinciyle biraraya gelmiş, üç kişilik gönüllü bir ekibiz ...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section><!-- End About Section -->
+        <!-- ======= Facts Section ======= -->
+        <section class="facts section-bg" data-aos="fade-up">
+            <div class="container">
+
+                <div class="row counters">
+
+                    <div class="col-lg-3 col-6 text-center">
+                        <span data-purecounter-start="0" data-purecounter-end="@roles.Count()" data-purecounter-duration="1" class="purecounter"></span>
+                        <p>Yazar</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6 text-center">
+                        <span data-purecounter-start="0" data-purecounter-end="@articles.Count()" data-purecounter-duration="1" class="purecounter"></span>
+                        <p>Makale</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6 text-center">
+                        <span data-purecounter-start="0" data-purecounter-end="@totalDay.Days" data-purecounter-duration="1" class="purecounter"></span>
+                        <p>Gündür Aktifiz</p>
+                    </div>
+
+                    <div class="col-lg-3 col-6 text-center">
+                        <span data-purecounter-start="0" data-purecounter-end="3" data-purecounter-duration="1" class="purecounter"></span>
+                        <p>Ekibimiz</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section><!-- End Facts Section -->
+        <!-- ======= Our Skills Section ======= -->
+        <section class="skills" data-aos="fade-up">
+            <div class="container">
+
+                <div class="section-title">
+                    <h2>Çalışma Alanlarımız</h2>
+                    <p>Web tabanlı uygulamalara modern teknolojilerle geliştirmeler yapmaktayız</p>
+                </div>
+
+                <div class="skills-content">
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <span class="skill">C# <i class="val">100%</i></span>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                            <span class="skill">HTML <i class="val">90%</i></span>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+                            <span class="skill">CSS <i class="val">70%</i></span>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <span class="skill">JavaScript <i class="val">25%</i></span>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+        </section><!-- End Our Skills Section -->
+        <!-- ======= Tetstimonials Section ======= -->
+        <section class="testimonials" data-aos="fade-up">
+            <div class="container">
+
+                <div class="section-title">
+                    <h2>Takımımız</h2>
+                    <p>  Toplumun bütün fertlerini makaleler okuyup öğrenmeye veya bilgilerini bu platformda yayınlayıp, bunun dünyanın her noktasındaki okuyuculara ulaştırabilmeyi amaçlamış gönüllü üç kişilik bir ekibiz :)</p>
+                </div>
+
+                <div class="testimonials-carousel swiper">
+                    <div class="swiper-wrapper">
+                        <div class="testimonial-item swiper-slide">
+
+                            <img src="~/mainBlog/img/team/19675_286024229294_6357935_n.jpg" class="testimonial-img" alt="" />
+                            <h3>Mehmet Resul Mutluer</h3>
+                            <h4>.Net Developer</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i>
+                                Bilge Adam Boost Yıldız Yazılımcı Yetiştirme Programından mezun olmadan önce Kocaeli'de 10 yıldan biraz fazla kendi eczanemi işlettim.  Zaman zaman yazılıma vakit ayırmaya çalışsam da eczacılık ve eczane işletmeciliğinden  yeterli vakit ve fırsat bulamadım. Yazılıma olan ilgimin zamanla daha ağır basması sebebiyle profesyonel eğitim almak için Bilge Adam Boost  eğitim programına katıldım.8 ay süren teorik ve proje uygulamalı eğitim sonrasında Full-Stack Developer olarak mezun olup kariyerime software developer olarak devam ediyorum.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+
+                        <div class="testimonial-item swiper-slide">
+
+                            <img src="~/mainBlog/img/team/fuko foto.png" class="testimonial-img" alt="" />
+                            <h3>Furkan Kılıç</h3>
+                            <h4>.Net Developer</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i>
+                                Kocaeli Üniversitesi Çevre Mühendisliği bölümünden mezun
+                                olduktan sonra ve eğitim sürecim boyunca aileme ait olan
+                                şirkette çeşitli pozisyonlarda çalıştım. Bilgisayar teknolojileri ne
+                                olan ilgimden dolayı kendim geliştirmek ve hayatıma bu alanda
+                                yön verebilmek için Bilge Adam Boost programına katıldım 8
+                                aylık bu süreçte teorik ve uygulamalı olarak full-stack eğitim
+                                aldım. Şu sıralarda sağımda ve solumda gördüğünüz güzel insanlarla bu projeyi yürüttük hem kendimizi geliştirip hem de yazılım alanında  bilgi sahibi olmak isteyen kişilere burada makaleler yazarak yardımcı olmayı hedefliyoruz.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+
+                        <div class="testimonial-item swiper-slide">
+
+                            <img src="~/mainBlog/img/team/HÜSO.jpg" class="testimonial-img" alt="" />
+                            <h3>Hüseyin Kılıç</h3>
+                            <h4>.Net Developer</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i>
+                                Herkese Selamlar.Karadeniz Teknik Üniversitesi İnşaat Mühendisliği mezunuyum.Yazılım Dünyasında Bende varım.Neden mi? çünkü üretmeyi seviyorum. Yeni yerler keşfetmek gibi bence, her proje yeni bir heyecan benim için.Bu Yoldaki serüvenim ise yaklaşık 9 ay önce yazılım eğitimi alarak başladı.Bilge Adam Boost programına katıldım ve eğitimimi tamamlayıp bu sektörde var olmak için bende burdayım diyorum.Ne demiş şair: "Bana bir yol göster yürünmesi gereken, bende o yolda sadece koşayım..."
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+
+
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+
+            </div>
+        </section><!-- End Ttstimonials Section -->
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-6 footer-links">
+                        <h4>Misafir Bağlantıları</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i><a asp-controller="HomePage" asp-action="Index">AnaSayfa</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Hakkımızda</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a asp-controller="Guest" asp-action="DevhellTeam">Takım</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-contact">
+                        <h4>İletişim</h4>
+                        <p>
+                            İSTANBUL - KOCAELİ<br>
+                            TÜRKİYE <br><br>
+                            <strong>Telefon:</strong> +90534 235 01 30<br>
+                            <strong>Telefon:</strong> +90534 746 54 09<br>
+                            <strong>Telefon:</strong> +90544 418 87 20<br>
+                            <strong>Email:</strong> blogapprhf@gmail.com<br>
+
+                        </p>
+
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-info">
+                        <h3>Hakkımızda</h3>
+                        <p>Toplumun bütün fertlerini makaleler okuyup öğrenmeye veya bilgilerini bu platformda yayınlayıp, bunun dünyanın her noktasındaki okuyuculara ulaştırabilmeyi amaçlamış gönüllü üç kişilik bir ekibiz :)</p>
+                        <div class="social-links mt-3">
+                            <a href="https://www.linkedin.com/in/furkan-kılıç-94mfk/" class="linkedin" style="margin-right: 20px; font-size: 15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Furkan Kılıç</a>
+                            <a href="https://www.linkedin.com/in/resul-mutluer/" class="linkedin" style="margin-right:30px; font-size:15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Resul Mutluer</a>
+                            <a href="https://www.linkedin.com/in/hüseyin-kilic96/" class="linkedin" style="margin-right: 20px; font-size: 15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Hüseyin Kılıç</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>DEVHELL</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/free-bootstrap-template-corporate-moderna/ -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="~/mainBlog/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="~/mainBlog/vendor/aos/aos.js"></script>
+    <script src="~/mainBlog/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/mainBlog/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/mainBlog/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/mainBlog/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/mainBlog/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="~/mainBlog/vendor/php-email-form/validate.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <!-- Template Main JS File -->
+    <script src="~/mainBlog/js/main.js"></script>
+
+</body>
+
+</html>

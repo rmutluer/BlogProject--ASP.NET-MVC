@@ -1,0 +1,385 @@
+﻿@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+@model Article
+@inject IGenericService<Article> _articleService
+@{
+    var CategoriesAll = _articleService.GetAll().GroupBy(p => p.Category).Select(g => new CategoryVM { Category = g.Key, CategoryCount = g.Count() }).OrderByDescending(c => c.CategoryCount).ToList();
+    AppUser user = await UserManager.GetUserAsync(User);
+    AppUser author = await UserManager.FindByIdAsync(Model.AuthorId.ToString());
+    var categories = _articleService.GetAll().GroupBy(p => p.Category).Select(g => new CategoryVM { Category = g.Key, CategoryCount = g.Count() }).OrderByDescending(c => c.CategoryCount).Take(5).ToList();
+    List<Article> articlesFive = _articleService.GetAll().Where(x => x.ConfirmationStatus == ENTITIES.Enums.ConfirmationStatus.Yes && x.Status == Status.Active).OrderByDescending(x => x.DateOfReply).Take(5).ToList();
+    Layout = null;
+    ViewData["Title"] = "DEVHELL";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Makale Detay - @ViewData["Title"]  </title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/mainBlog/img/icons8-falcon-50.png" rel="icon" />
+    <link href="~/mainBlog/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/mainBlog/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/mainBlog/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="~/lib/toastr.js/toastr.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="~/mainBlog/css/style.css" rel="stylesheet">
+
+    <!-- =======================================================
+    * Template Name: Moderna - v4.11.0
+    * Template URL: https://bootstrapmade.com/free-bootstrap-template-corporate-moderna/
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+</head>
+
+<body>
+
+    <header id="header" class="fixed-top d-flex align-items-center ">
+        <div class="container d-flex justify-content-between align-items-center">
+
+            <div class="logo">
+                <h1 class="text-light"><a asp-controller="Guest" asp-action="HomePage"><span>DEVHELL</span></a></h1>
+                <!-- Uncomment below if you prefer to use an image logo -->
+                <!-- <a href="index.html"><img src="~/mainBlog/img/logo.png" alt="" class="img-fluid"></a>-->
+            </div>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        @* anasayfa *@
+                        <li><a asp-controller="Guest" asp-action="HomePage">Anasayfa</a></li>
+                        @* tüm makaleler *@
+                        <li><a asp-controller="Author" asp-action="MyArticleListForEdit">Makalelerim</a></li>
+                        @* makaleler *@
+                        <li><a asp-controller="Author" asp-action="CreateArticle">Makale Yaz <i style="font-size:18px;" class="fa fa-pencil-square-o"></i></a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>@user.GetFullName().ToUpper()</span> <i class="bi bi-chevron-down"></i></a>
+                            <ul>
+                                <li><a asp-controller="Author" asp-action="AuthorProfile"><i class="fas fa-user-edit"></i>Profil</a></li>
+
+                                <li><a asp-controller="Login" asp-action="Logout">Çıkış Yap<i class="fas fa-sign-out-alt"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            }
+            else
+            {
+
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        <li><a asp-controller="Guest" asp-action="HomePage">Anasayfa</a></li>
+                        <li><a asp-controller="Guest" asp-action="DevhellAbout">Hakkımızda</a></li>
+                        <li><a asp-controller="Guest" asp-action="DevhellTeam">Ekibimiz</a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>Misafir</span> <i class="bi bi-chevron-down"></i></a>
+                            <ul>
+                                <li><a asp-controller="HomePage" asp-action="Index">Giriş Ekranına Dön</a></li>
+                                <li><a asp-controller="Login" asp-action="Login">Üye Ol</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#footer">İletişim</a></li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            }
+
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+
+        <!-- ======= Blog Single Section ======= -->
+        <section id="blog" class="blog">
+            <div class="container" data-aos="fade-up">
+
+                <div class="row">
+
+                    <div class="col-lg-8 entries">
+                        @* 1 *@
+
+                        <article class="entry entry-single">
+
+                            @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                            {
+                                <div class="entry-img ">
+                                    <img src="@Model.PhotoPath" alt="" class="img-fluid">
+                                </div>
+
+                            }
+                            else
+                            {
+                                <div class="entry-img text-center">
+                                    <img src="~/img/makale.jpg" alt="" class="img-fluid" />
+                                </div>
+                            }
+
+                            <h2 class="entry-title">
+                                <a asp-controller="Guest" asp-action="ArticleDetails">@Model.Title</a>
+                            </h2>
+
+                            <div class="entry-meta">
+                                <ul>
+                                    <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a asp-controller="Guest" asp-action="ArticleDetails">@author.GetFullName().ToTitleCase()</a></li>
+                                    <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a asp-controller="Guest" asp-action="ArticleDetails"><time datetime="2020-01-01">@Model.CreateDate.ToShortDateString()</time></a></li>
+                                    <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a asp-controller="Guest" asp-action="ArticleDetails">@Model.Category</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="entry-content">
+                                <p>
+                                    @Model.Content
+                                </p>
+                                <blockquote>
+                                    <p>
+                                        <b>"Türkiyem! Yaralarımızı Hep Birlikte Saracağız 06.02.2022-04:17 "<i class="bi bi-heartbreak-fill"></i></b>
+                                    </p>
+                                </blockquote>
+
+                            </div>
+
+                            <div class="entry-footer">
+                                <i class="bi bi-folder"></i>
+                                <ul class="cats">
+                                    <li><a href="#">Makale Tarihi: @Model.CreateDate.ToShortDateString()</a></li>
+                                </ul>
+
+                                <i class="bi bi-hand-thumbs-up-fill" style="margin-left:450px;"></i>
+                                <ul class="tags">
+                                    <li><a href="#">Beğen</a></li>
+                                </ul>
+                                <i class="bi bi-hand-thumbs-down-fill"></i>
+                                <ul class="tags">
+                                    <li><a href="#">Linç Et</a></li>
+                                </ul>
+                            </div>
+
+                        </article><!-- End blog entry -->
+
+
+
+                    </div> @*1*@
+
+                    <div class="col-lg-4">
+
+                        <div class="sidebar">
+
+                            <h3 class="sidebar-title">Arama</h3>
+                            <div class="sidebar-item search-form">
+                                <form asp-controller="Guest" asp-action="SearchArticles" asp-route-id="search" method="get">
+                                    <input type="text" name="search" class="form-control" placeholder="Anahtar Kelime">
+                                    <button type="submit"><i class="bi bi-search"></i></button>
+                                </form>
+                            </div><!-- End sidebar search formn-->
+
+                            <h3 class="sidebar-title">En Popiler Kategoriler</h3>
+                            <div class="sidebar-item categories">
+                                <ul>
+
+                                    @foreach (var item in categories)
+                                    {
+
+                                        <li><a href="#">@item.Category<span>(@item.CategoryCount) </span></a></li>
+
+
+                                    }
+
+                                </ul>
+                            </div><!-- End sidebar categories-->
+
+                            <h3 class="sidebar-title">En Yeniler</h3>
+                            <div class="sidebar-item recent-posts">
+                                @foreach (var item in articlesFive)
+                                {
+                                    <div class="post-item clearfix">
+                                        <img src="@item.PhotoPath" alt="">
+                                        <h4><a asp-controller="Guest" asp-action="ArticleDetails" asp-route-id="@item.ArticleID">@item.Title</a></h4>
+                                        <time datetime="2020-01-01">@item.CreateDate.ToShortDateString()</time>
+                                    </div>
+                                }
+
+
+                            </div><!-- End sidebar recent posts-->
+
+                            <h3 class="sidebar-title">Tüm Kategoriler</h3>
+                            <div class="sidebar-item tags">
+                                <ul>
+                                    @foreach (var item in CategoriesAll)
+                                    {
+                                        <li><a href="#">@item.Category</a></li>
+                                    }
+
+
+                                </ul>
+                            </div><!-- End sidebar tags-->
+
+                        </div><!-- End sidebar -->
+
+                    </div><!-- End blog sidebar -->
+
+                </div>
+
+            </div>
+        </section><!-- End Blog Single Section -->
+        <section class="contact" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+            <div class="container">
+
+                <div class="row">
+
+                    <div class="col-lg-8">
+                        <form asp-action="SendCommentMail" asp-route-id="@Model.AuthorId" role="form" method="post" class="php-email-form">
+                            <h5>Yazara Mesajınız</h5>
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <input type="text" name="name" class="form-control" id="name" placeholder="İsim" required>
+                                </div>
+                                <div class="col-md-6 form-group mt-3 mt-md-0">
+                                    <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <input type="text" class="form-control" name="subject" id="subject" placeholder="Konu" required>
+                            </div>
+                            <div class="form-group mt-3">
+                                <textarea class="form-control" name="message" rows="5" placeholder="Mesaj" required></textarea>
+                            </div>
+
+                            <div class="text-center"><button type="submit">Mesaj Gönder</button></div>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </section><!-- End Contact Section -->
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-6 footer-links">
+                        <h4>Misafir Bağlantıları</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i><a asp-controller="HomePage" asp-action="Index">AnaSayfa</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Hakkımızda</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Takım</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-contact">
+                        <h4>İletişim</h4>
+                        <p>
+                            İSTANBUL - KOCAELİ<br>
+                            TÜRKİYE <br><br>
+                            <strong>Telefon:</strong> +90534 235 01 30<br>
+                            <strong>Telefon:</strong> +90534 746 54 09<br>
+                            <strong>Telefon:</strong> +90544 418 87 20<br>
+                            <strong>Email:</strong> blogapprhf@gmail.com<br>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-info">
+                        <h3>Hakkımızda</h3>
+                        <p>Toplumun bütün fertlerini makaleler okuyup öğrenmeye veya bilgilerini bu platformda yayınlayıp, bunun dünyanın her noktasındaki okuyuculara ulaştırabilmeyi amaçlamış gönüllü üç kişilik bir ekibiz :)</p>
+                        <div class="social-links mt-3">
+                            <a href="https://www.linkedin.com/in/furkan-kılıç-94mfk/" class="linkedin" style="margin-right: 20px; font-size: 15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Furkan Kılıç</a>
+                            <a href="https://www.linkedin.com/in/resul-mutluer/" class="linkedin" style="margin-right:30px; font-size:15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Resul Mutluer</a>
+                            <a href="https://www.linkedin.com/in/hüseyin-kilic96/" class="linkedin" style="margin-right: 20px; font-size: 15px;"><i class="bx bxl-linkedin" style="padding-bottom:15px;"></i>Hüseyin Kılıç</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>DEVHELL</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/free-bootstrap-template-corporate-moderna/ -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="~/mainBlog/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="~/mainBlog/vendor/aos/aos.js"></script>
+    <script src="~/mainBlog/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/mainBlog/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/mainBlog/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/mainBlog/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/mainBlog/vendor/waypoints/noframework.waypoints.js"></script>
+    @*<script src="~/mainBlog/vendor/php-email-form/validate.js"></script>*@
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/mainBlog/js/main.js"></script>
+    <script src="~/lib/toastr.js/toastr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip({
+                html: true,
+                placement: "bottom"
+            });
+        });
+    </script>
+    @{
+        var message = TempData["Message"];
+        if (message != null)
+        {
+            <script>
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.success("@message")
+            </script>
+        }
+    }
+    @{
+        var message2 = TempData["Message2"];
+        if (message2 != null)
+        {
+            <script>
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.error("@message2")
+            </script>
+        }
+    }
+</body>
+
+</html>
+

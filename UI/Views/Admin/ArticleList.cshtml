@@ -1,0 +1,574 @@
+﻿@model ArticlesUsersVM
+
+@{
+    ViewData["Title"] = "Tüm Makaleler";
+    Layout = "_AdminLayout";
+
+
+}
+
+<div class="container" style="background-color:aqua;">
+    <div class="d-flex flex-wrap header-sticky mr-0" style="width:67%">
+        <h1 class="d-inline float-left">Tüm Makaleler</h1>
+        <div class="row d-flex ml-auto pr-5">
+            <form class="form-inline" asp-action="ArticleList">
+                <div class="form-group mb-2">
+                    <input type="text" name="articleName" class="form-control" placeholder="Makale Adı Giriniz: ">
+                </div>
+                <div class="form-group mb-2">
+                    <input type="submit" class="btn btn-outline-dark mb-auto ml-2" value="Makale Ara" />
+                    <button asp-controller="Admin" asp-action="ArticleList" class="btn btn-outline-dark mb-auto ml-2">Yenile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="col-12 d-flex flex-column align-self-start ">
+    <ul class="nav nav-tabs ml-5">
+        <li class="active"><a data-toggle="tab" href="#all">Tümü</a></li>
+        <li><a data-toggle="tab" href="#active">Aktif</a></li>
+        <li><a data-toggle="tab" href="#passive">Pasif</a></li>
+        <li><a data-toggle="tab" href="#pending">Beklemede</a></li>
+    </ul>
+    <div class="tab-content">
+        @* 1.tab All /start *@
+        <div id="all" class="tab-pane fade in active in show">
+            <div class="container-fluid overflow-auto align-self-start m-4 tableFixHead">
+                <table class="table table-hover">
+
+                    <thead>
+                        <tr>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.ArticleID)
+                                </th>*@
+                            <th>
+                                Makale Yazarı
+                            </th>
+                            <th scope="col">
+                                Başlık
+                            </th>
+                            <th scope="col">
+                                İçerik
+                            </th>
+                            <th scope="col">
+                                Cevaplanma Tarihi
+                            </th>
+                            <th>
+                                Oluşturma Tarihi
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.UpdateDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DeleteDate)
+                                </th>*@
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.PhotoPath)
+                                </th>*@
+                            <th scope="col">
+                                Onaylanma Durumu
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Id)
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model.Articles)
+                        {
+                            <tr>
+
+
+                                @foreach (var user in Model.AppUsers)
+                                {
+
+
+                                    @if (user.Id == item.AuthorId)
+                                    {
+                                        <td>
+                                            @Html.DisplayFor(modelItem => user.FirstName) @Html.DisplayFor(modelItem => user.LastName)
+
+                                        </td>
+
+                                    }
+
+                                }
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Title)
+                                </td>
+
+                                <td>
+                                    <p class="description" data-toggle="tooltip" data-placement="bottom" title="@item.Content">
+                                        @Html.DisplayFor(modelItem => item.Content)
+                                    </p>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateOfReply)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreateDate)
+                                </td>
+                                @*<td>
+                                        @Html.DisplayFor(modelItem => item.UpdateDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DeleteDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.PhotoPath)
+                                    </td>*@
+                                <td class="text-center">
+                                    @if (Convert.ToInt32(item.ConfirmationStatus) == 1)
+                                    {
+                                        <i class="mdi mdi-circle status-active"></i>
+                                    }
+                                    else if (Convert.ToInt32(item.ConfirmationStatus) == 2)
+                                    {
+                                        <i class="mdi mdi-circle status-passive"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="mdi mdi-circle status-pending"></i>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.ConfirmationStatus ==ConfirmationStatus.Pending)
+                                    {
+                                        <a class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Onayla" onclick="confirmArticle(@item.ArticleID)">
+                                            <i class="mdi mdi-check-bold"></i>
+                                        </a>
+                                        <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Reddet" onclick="refuseArticle(@item.ArticleID)">
+                                            <i class="mdi mdi-close"></i>
+                                        </a>
+                                        <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Sil" onclick="SetArticlePassive(@item.ArticleID)">
+                                            <i class="mdi mdi-delete"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @* 1.tab All /end *@
+
+        @* 2.tab active /start *@
+        <div id="active" class="tab-pane fade">
+            <div class="container-fluid overflow-auto align-self-start m-4 tableFixHead">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.ArticleID)
+                                </th>*@
+                            <th>
+                                Makale Yazarı
+                            </th>
+                            <th scope="col">
+                                Başlık
+                            </th>
+                            <th scope="col">
+                                İçerik
+                            </th>
+                            <th scope="col">
+                                Cevaplanma Tarihi
+                            </th>
+                            <th>
+                                Oluşturma Tarihi
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.UpdateDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DeleteDate)
+                                </th>*@
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.PhotoPath)
+                                </th>*@
+                            <th scope="col">
+                                Onaylanma Durumu
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Id)
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Articles)
+                        {
+                            @if (item.ConfirmationStatus == ConfirmationStatus.Yes)
+                            {
+
+                                <tr>
+
+                                    @foreach (var user in Model.AppUsers)
+                                    {
+
+
+                                        @if (user.Id == item.AuthorId)
+                                        {
+                                            <td>
+                                                @Html.DisplayFor(modelItem => user.FirstName) @Html.DisplayFor(modelItem => user.LastName)
+
+                                            </td>
+
+                                        }
+
+                                    }
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.ArticleID)
+                                        </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+
+                                    <td>
+                                        <p class="description" data-toggle="tooltip" data-placement="bottom" title="@item.Content">
+                                            @Html.DisplayFor(modelItem => item.Content)
+                                        </p>
+
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateOfReply)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CreateDate)
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.UpdateDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DeleteDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PhotoPath)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (Convert.ToInt32(item.ConfirmationStatus) == 1)
+                                        {
+                                            <i class="mdi mdi-circle status-active"></i>
+                                        }
+                                        else if (Convert.ToInt32(item.ConfirmationStatus) == 2)
+                                        {
+                                            <i class="mdi mdi-circle status-passive"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="mdi mdi-circle status-pending"></i>
+                                        }
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (item.ConfirmationStatus == ConfirmationStatus.Pending)
+                                        {
+                                            <a class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Onayla" onclick="confirmArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-check-bold"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Reddet" onclick="refuseArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-close"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Sil" onclick="SetArticlePassive(@item.ArticleID)">
+                                                <i class="mdi mdi-delete"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @* 2.tab active /end *@
+
+        @* 3.tab passive /start *@
+
+        <div id="passive" class="tab-pane fade">
+            <div class="container-fluid overflow-auto align-self-start m-4 tableFixHead">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.ArticleID)
+                                </th>*@
+                            <th>
+                                Makale Yazarı
+                            </th>
+                            <th scope="col">
+                                Başlık
+                            </th>
+                            <th scope="col">
+                                İçerik
+                            </th>
+                            <th scope="col">
+                                Cevaplanma Tarihi
+                            </th>
+                            <th>
+                                Oluşturma Tarihi
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.UpdateDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DeleteDate)
+                                </th>*@
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.PhotoPath)
+                                </th>*@
+                            <th scope="col">
+                                Onaylanma Durumu
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Id)
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Articles)
+                        {
+                            @if (item.ConfirmationStatus == ConfirmationStatus.No)
+                            {
+
+                                <tr>
+
+                                    @foreach (var user in Model.AppUsers)
+                                    {
+
+
+                                        @if (user.Id == item.AuthorId)
+                                        {
+                                            <td>
+                                                @Html.DisplayFor(modelItem => user.FirstName) @Html.DisplayFor(modelItem => user.LastName)
+
+                                            </td>
+
+                                        }
+
+                                    }
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.ArticleID)
+                                        </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+
+                                    <td>
+                                        <p class="description" data-toggle="tooltip" data-placement="bottom" title="@item.Content">
+                                            @Html.DisplayFor(modelItem => item.Content)
+                                        </p>
+
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateOfReply)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CreateDate)
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.UpdateDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DeleteDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PhotoPath)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (Convert.ToInt32(item.ConfirmationStatus) == 1)
+                                        {
+                                            <i class="mdi mdi-circle status-active"></i>
+                                        }
+                                        else if (Convert.ToInt32(item.ConfirmationStatus) == 2)
+                                        {
+                                            <i class="mdi mdi-circle status-passive"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="mdi mdi-circle status-pending"></i>
+                                        }
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (item.ConfirmationStatus == ConfirmationStatus.Pending)
+                                        {
+                                            <a class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Onayla" onclick="confirmArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-check-bold"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Reddet" onclick="refuseArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-close"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Sil" onclick="SetArticlePassive(@item.ArticleID)">
+                                                <i class="mdi mdi-delete"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @* 3.tab passive /end *@
+
+        @* 4.tab pending /start *@
+        <div id="pending" class="tab-pane fade">
+            <div class="container-fluid overflow-auto align-self-start m-4 tableFixHead">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.ArticleID)
+                                </th>*@
+                            <th>
+                                Makale Yazarı
+                            </th>
+                            <th scope="col">
+                                Başlık
+                            </th>
+                            <th scope="col">
+                                İçerik
+                            </th>
+                            <th scope="col">
+                                Cevaplanma Tarihi
+                            </th>
+                            <th>
+                                Oluşturma Tarihi
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.UpdateDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DeleteDate)
+                                </th>*@
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.PhotoPath)
+                                </th>*@
+                            <th scope="col">
+                                Onaylanma Durumu
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Id)
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Articles)
+                        {
+                            @if (item.ConfirmationStatus == ConfirmationStatus.Pending)
+                            {
+                                <tr>
+
+                                    @foreach (var user in Model.AppUsers)
+                                    {
+
+
+                                        @if (user.Id == item.AuthorId)
+                                        {
+                                            <td>
+                                                @Html.DisplayFor(modelItem => user.FirstName) @Html.DisplayFor(modelItem => user.LastName)
+
+                                            </td>
+
+                                        }
+
+                                    }
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.ArticleID)
+                                        </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+
+                                    <td>
+                                        <p class="description" data-toggle="tooltip" data-placement="bottom" title="@item.Content">
+                                            @Html.DisplayFor(modelItem => item.Content)
+                                        </p>
+
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DateOfReply)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CreateDate)
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.UpdateDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DeleteDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PhotoPath)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (Convert.ToInt32(item.ConfirmationStatus) == 1)
+                                        {
+                                            <i class="mdi mdi-circle status-active"></i>
+                                        }
+                                        else if (Convert.ToInt32(item.ConfirmationStatus) == 2)
+                                        {
+                                            <i class="mdi mdi-circle status-passive"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="mdi mdi-circle status-pending"></i>
+                                        }
+                                    </td>
+                                    @*<td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>*@
+                                    <td class="text-center">
+                                        @if (item.ConfirmationStatus == ConfirmationStatus.Pending)
+                                        {
+                                            <a class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Onayla" onclick="confirmArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-check-bold"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Reddet" onclick="refuseArticle(@item.ArticleID)">
+                                                <i class="mdi mdi-close"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Sil" onclick="SetArticlePassive(@item.ArticleID)">
+                                                <i class="mdi mdi-delete"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @* 4.tab pending /end *@
+
+    </div>
+</div>

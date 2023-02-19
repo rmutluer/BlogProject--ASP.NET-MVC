@@ -1,0 +1,47 @@
+﻿@model ArticlesUsersVM 
+@inject UserManager<AppUser> userManager 
+
+@{
+    ViewData["Title"] = "Anasayfa";
+    Layout = "_AdminLayout";
+    AppUser user = await userManager.GetUserAsync(User);
+    var roles = await userManager.GetUsersInRoleAsync("author");
+   
+}
+
+<div class="row row-cols-1 row-cols-md-2 g-4 col-md-12 ml-5" >
+    @* 1.CARD *@
+    <div class="card col-md-5 ml-5">
+        <div class="card-header">
+            <h1 class="card-title text-center">Makale Sayısı</h1>
+        </div>
+        <ul class="list-group list-group-flush d-flex flex-wrap  justify-content-center">
+            <li class="list-group-item text-center "><p style="color:white">.</p></li>
+            
+            <li class="list-group-item text-center flex-wrap justify-content-center">
+                <strong><p style="text-transform: uppercase; vertical-align: middle">makale sayısı: @Model.Articles.ToList().Count</p></strong>
+            </li>
+        </ul>
+        <div class="card-body">
+            <a class="btn btn-outline-warning ml-auto  align-self-center" asp-action="ArticleList2">Listele</a>
+        </div>
+    </div>
+    @* 2.CARD *@
+    <div class="card col-md-5 float-left ml-5">
+        <div class="card-header">
+            <h1 class="card-title text-center">Yazar Sayısı</h1>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item text-center "><p style="color:white">.</p></li>
+            <li class="list-group-item text-center">
+            <strong><p style="text-transform:uppercase">yazar sayısı: @roles.Count  </p></strong>
+
+
+        </ul>
+        <div class="card-body">
+            <a class="btn btn-outline-warning ml-auto  align-self-center" asp-action="AuthorList">Listele</a>
+        </div>
+    </div>
+
+</div>
+
